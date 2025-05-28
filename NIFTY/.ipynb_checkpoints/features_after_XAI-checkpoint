@@ -1,0 +1,1103 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "f04ee613-425e-4fca-988b-9f2d0a235be0",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import pandas as pd\n",
+    "import random\n",
+    "import numpy as np\n",
+    "import datetime\n",
+    "import matplotlib.pyplot as plt\n",
+    "import yfinance as yf\n",
+    "import pandas_ta as ta"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "id": "5d406794-e021-49c0-9b23-f4a08224305a",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Define the Nifty 50 index symbol\n",
+    "nifty50_symbol = \"^NSEI\"  # Symbol for Nifty 50 on Yahoo Finance\n",
+    "# Define the date range for data download\n",
+    "start_date = \"2013-01-01\"  # Start date (YYYY-MM-DD)\n",
+    "end_date = \"2024-12-31\"    # End date (YYYY-MM-DD)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "id": "4693d67c-d2e2-4296-8fc8-35efa11fc11a",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "YF.download() has changed argument auto_adjust default to True\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "[*********************100%***********************]  1 of 1 completed\n"
+     ]
+    }
+   ],
+   "source": [
+    "# Download the data\n",
+    "df = yf.download(nifty50_symbol, start=start_date, end=end_date)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "id": "ded07db9-37bb-4202-a8f7-fcc007784980",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead tr th {\n",
+       "        text-align: left;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead tr:last-of-type th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr>\n",
+       "      <th>Price</th>\n",
+       "      <th>Close</th>\n",
+       "      <th>High</th>\n",
+       "      <th>Low</th>\n",
+       "      <th>Open</th>\n",
+       "      <th>Volume</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Ticker</th>\n",
+       "      <th>^NSEI</th>\n",
+       "      <th>^NSEI</th>\n",
+       "      <th>^NSEI</th>\n",
+       "      <th>^NSEI</th>\n",
+       "      <th>^NSEI</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Date</th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>2024-12-23</th>\n",
+       "      <td>23753.449219</td>\n",
+       "      <td>23869.550781</td>\n",
+       "      <td>23647.199219</td>\n",
+       "      <td>23738.199219</td>\n",
+       "      <td>189800</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2024-12-24</th>\n",
+       "      <td>23727.650391</td>\n",
+       "      <td>23867.650391</td>\n",
+       "      <td>23685.150391</td>\n",
+       "      <td>23769.099609</td>\n",
+       "      <td>177700</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2024-12-26</th>\n",
+       "      <td>23750.199219</td>\n",
+       "      <td>23854.500000</td>\n",
+       "      <td>23653.599609</td>\n",
+       "      <td>23775.800781</td>\n",
+       "      <td>177700</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2024-12-27</th>\n",
+       "      <td>23813.400391</td>\n",
+       "      <td>23938.849609</td>\n",
+       "      <td>23800.599609</td>\n",
+       "      <td>23801.400391</td>\n",
+       "      <td>176800</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2024-12-30</th>\n",
+       "      <td>23644.900391</td>\n",
+       "      <td>23915.349609</td>\n",
+       "      <td>23599.300781</td>\n",
+       "      <td>23796.900391</td>\n",
+       "      <td>364900</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "Price              Close          High           Low          Open  Volume\n",
+       "Ticker             ^NSEI         ^NSEI         ^NSEI         ^NSEI   ^NSEI\n",
+       "Date                                                                      \n",
+       "2024-12-23  23753.449219  23869.550781  23647.199219  23738.199219  189800\n",
+       "2024-12-24  23727.650391  23867.650391  23685.150391  23769.099609  177700\n",
+       "2024-12-26  23750.199219  23854.500000  23653.599609  23775.800781  177700\n",
+       "2024-12-27  23813.400391  23938.849609  23800.599609  23801.400391  176800\n",
+       "2024-12-30  23644.900391  23915.349609  23599.300781  23796.900391  364900"
+      ]
+     },
+     "execution_count": 4,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df.tail()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "id": "d2531265-2577-4f9b-9b23-7295e8c4ac8e",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Convert index to datetime format if not already done\n",
+    "df.index = pd.to_datetime(df.index, format='%d-%m-%Y')\n",
+    "# Create 'date1' column as the same date from the index\n",
+    "df['date'] = df.index\n",
+    "# Extract weekday and month\n",
+    "df['weekday'] = df.index.dayofweek  # Monday=0, Sunday=6\n",
+    "df['month'] = df.index.month        # January=1, December=12"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "id": "b7ca3147-7ef5-449d-9d03-ee25f25408bb",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#df.index = pd.to_datetime(df.index)\n",
+    "df = df.reset_index(drop=True)\n",
+    "df.to_csv('nifty.csv', index=True) "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "65cf80ba-1d0b-44fd-95d4-c7c73dd89d5d",
+   "metadata": {},
+   "source": [
+    "<h1>Delete second row then read_csv</h1>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "id": "4a72ee27-960f-4d84-a28d-71c07b1588f8",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df = pd.read_csv('nifty.csv', index_col=0, low_memory=False)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "id": "b1ab9bad-9c4f-4fdc-bb89-84f6e67c1605",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Close</th>\n",
+       "      <th>High</th>\n",
+       "      <th>Low</th>\n",
+       "      <th>Open</th>\n",
+       "      <th>Volume</th>\n",
+       "      <th>date</th>\n",
+       "      <th>weekday</th>\n",
+       "      <th>month</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>2940</th>\n",
+       "      <td>23753.44922</td>\n",
+       "      <td>23869.55078</td>\n",
+       "      <td>23647.19922</td>\n",
+       "      <td>23738.19922</td>\n",
+       "      <td>189800</td>\n",
+       "      <td>23-12-2024</td>\n",
+       "      <td>0</td>\n",
+       "      <td>12</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2941</th>\n",
+       "      <td>23727.65039</td>\n",
+       "      <td>23867.65039</td>\n",
+       "      <td>23685.15039</td>\n",
+       "      <td>23769.09961</td>\n",
+       "      <td>177700</td>\n",
+       "      <td>24-12-2024</td>\n",
+       "      <td>1</td>\n",
+       "      <td>12</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2942</th>\n",
+       "      <td>23750.19922</td>\n",
+       "      <td>23854.50000</td>\n",
+       "      <td>23653.59961</td>\n",
+       "      <td>23775.80078</td>\n",
+       "      <td>177700</td>\n",
+       "      <td>26-12-2024</td>\n",
+       "      <td>3</td>\n",
+       "      <td>12</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2943</th>\n",
+       "      <td>23813.40039</td>\n",
+       "      <td>23938.84961</td>\n",
+       "      <td>23800.59961</td>\n",
+       "      <td>23801.40039</td>\n",
+       "      <td>176800</td>\n",
+       "      <td>27-12-2024</td>\n",
+       "      <td>4</td>\n",
+       "      <td>12</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2944</th>\n",
+       "      <td>23644.90039</td>\n",
+       "      <td>23915.34961</td>\n",
+       "      <td>23599.30078</td>\n",
+       "      <td>23796.90039</td>\n",
+       "      <td>364900</td>\n",
+       "      <td>30-12-2024</td>\n",
+       "      <td>0</td>\n",
+       "      <td>12</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "            Close         High          Low         Open  Volume        date  \\\n",
+       "2940  23753.44922  23869.55078  23647.19922  23738.19922  189800  23-12-2024   \n",
+       "2941  23727.65039  23867.65039  23685.15039  23769.09961  177700  24-12-2024   \n",
+       "2942  23750.19922  23854.50000  23653.59961  23775.80078  177700  26-12-2024   \n",
+       "2943  23813.40039  23938.84961  23800.59961  23801.40039  176800  27-12-2024   \n",
+       "2944  23644.90039  23915.34961  23599.30078  23796.90039  364900  30-12-2024   \n",
+       "\n",
+       "      weekday  month  \n",
+       "2940        0     12  \n",
+       "2941        1     12  \n",
+       "2942        3     12  \n",
+       "2943        4     12  \n",
+       "2944        0     12  "
+      ]
+     },
+     "execution_count": 8,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df.tail()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "id": "47ee3c87-9404-4fd7-a51b-aef6f39d0b15",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "         NaN Count  Inf Count\n",
+      "Close            0          0\n",
+      "High             0          0\n",
+      "Low              0          0\n",
+      "Open             0          0\n",
+      "Volume           0          0\n",
+      "date             0          0\n",
+      "weekday          0          0\n",
+      "month            0          0\n"
+     ]
+    }
+   ],
+   "source": [
+    "# Check for NaN or Inf values\n",
+    "summary = df.isna().sum().to_frame(name=\"NaN Count\")  # Count of NaN values\n",
+    "summary[\"Inf Count\"] = ((df == np.inf) | (df == -np.inf)).sum()  # Count of Inf values\n",
+    "\n",
+    "print(summary)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "id": "6b7ed82f-76d3-4bcb-aaeb-ce902891bff9",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Close      float64\n",
+      "High       float64\n",
+      "Low        float64\n",
+      "Open       float64\n",
+      "Volume       int64\n",
+      "date        object\n",
+      "weekday      int64\n",
+      "month        int64\n",
+      "dtype: object\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(df.dtypes)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 11,
+   "id": "beeb3e2b-56a6-4eb8-b193-7f41e48d94b4",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df['oc']=((df['Close']-df['Open'])/df['Open'])*100 \n",
+    "#df['target_oc']=((df['Close'].shift(-1)-df['Open'].shift(-1))/df['Open'].shift(-1))*100 #one day before\n",
+    "df['hl']=((df['High']-df['Low'])/df['Low'])*100\n",
+    "df['oh']=((df['High']-df['Open'])/df['Open'])*100\n",
+    "df['ol']=((df['Low']-df['Open'])/df['Open'])*100\n",
+    "df['co'] = ((df['Close'] - df['Open'].shift(-1)) / df['Close']) * 100\n",
+    "#df['vol']=df['Volume']"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "730cac19-f18d-49b7-a096-e4912d1802d4",
+   "metadata": {},
+   "source": [
+    "<h1>if >0.15 {1} elseif < -0.15 {2}  else {0}</h1>"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "dd44459f-56a9-4402-930a-7250e8108abb",
+   "metadata": {},
+   "source": [
+    "# Define target labels\n",
+    "df[\"Signal\"] = np.where(df[\"oc\"].shift(-1) > 0.15, 1,   # Buy\n",
+    "                np.where(df[\"oc\"].shift(-1) < -0.15, 2,  # Sell\n",
+    "                         0))  # Hold"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 12,
+   "id": "f666da54-c9b6-49fa-b802-18fb6a656368",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Define target labels\n",
+    "df[\"Signal\"] = np.where(df[\"oc\"].shift(-1) > 0, 1, 0)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 13,
+   "id": "a72539b0-cf6b-4b71-b162-4ae9b69084f9",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Compute Moving Averages\n",
+    "df['SMA_5'] = ta.sma(df['Close'], length=5)\n",
+    "# Compute Moving Averages\n",
+    "df['SMA_10'] = ta.sma(df['Close'], length=10)\n",
+    "# Compute Moving Averages\n",
+    "df['SMA_20'] = ta.sma(df['Close'], length=20)\n",
+    "# Compute Moving Averages\n",
+    "df['SMA_50'] = ta.sma(df['Close'], length=50)\n",
+    "# Compute Moving Averages\n",
+    "df['SMA_100'] = ta.sma(df['Close'], length=100)\n",
+    "# Compute Moving Averages\n",
+    "df['SMA_200'] = ta.sma(df['Close'], length=200)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 14,
+   "id": "fea6fe8a-496f-4207-b090-8a342c431dae",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df['EMA_5'] = ta.ema(df['Close'], length=5)\n",
+    "df['EMA_10'] = ta.ema(df['Close'], length=10)\n",
+    "df['EMA_20'] = ta.ema(df['Close'], length=20)\n",
+    "df['EMA_50'] = ta.ema(df['Close'], length=50)\n",
+    "df['EMA_100'] = ta.ema(df['Close'], length=100)\n",
+    "df['EMA_200'] = ta.ema(df['Close'], length=200)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 15,
+   "id": "c06a480b-0696-449b-97a3-ba2bd2174667",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Compute MACD\n",
+    "macd = ta.macd(df['Close'])\n",
+    "df = df.join(macd)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 16,
+   "id": "d300cbd0-1872-4e97-8a8e-c87df8b43f7e",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Compute Supertrend with default settings (10-period ATR and 3x multiplier)\n",
+    "supertrend_df = ta.supertrend(df['High'], df['Low'], df['Close'])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 17,
+   "id": "f5a22919-bc23-49db-a412-f8e9afb2343a",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Merge Supertrend output with main DataFrame\n",
+    "df = df.join(supertrend_df)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 18,
+   "id": "68be3a3c-37a9-4344-9a9d-34752fcdc497",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Compute KAMA (Default length = 10)\n",
+    "df['KAMA'] = ta.kama(df['Close'], length=10)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 19,
+   "id": "80510209-1d28-43fe-a045-d6e8b88b3549",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Compute Weighted Moving Average (WMA) with a period of 10\n",
+    "df['WMA_5'] = ta.wma(df['Close'], length=5)\n",
+    "df['WMA_10'] = ta.wma(df['Close'], length=10)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 20,
+   "id": "585d4855-a957-4e60-8c9b-e2d866666534",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Compute Hull Moving Average (HMA) with a period of 20\n",
+    "df['HMA_10'] = ta.hma(df['Close'], length=10)\n",
+    "df['HMA_20'] = ta.hma(df['Close'], length=20)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 21,
+   "id": "21651974-d464-455a-81ce-602f26536e66",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Compute TMA using double SMA (Workaround)\n",
+    "df['TMA_10'] = ta.sma(df['Close'], length=10).rolling(window=10).mean()\n",
+    "df['TMA_20'] = ta.sma(df['Close'], length=20).rolling(window=20).mean()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 22,
+   "id": "f0af71f5-b897-4dd8-aa81-0322dbb22825",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Compute Least Squares Moving Average (LSMA) with a period of 20\n",
+    "df['LSMA_20'] = ta.linreg(df['Close'], length=20)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 23,
+   "id": "9741b26f-395b-45e7-ae51-3fbae99f8a47",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Compute RSI for 7-period and 14-period\n",
+    "df['RSI_7'] = ta.rsi(df['Close'], length=7)\n",
+    "df['RSI_14'] = ta.rsi(df['Close'], length=14)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 24,
+   "id": "2235b64f-6961-4df8-ad8f-1fc8f8dcc23a",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Compute Stochastic Oscillator (14-period)\n",
+    "stoch = ta.stoch(df['High'], df['Low'], df['Close'], k=14, d=3)\n",
+    "\n",
+    "# Store %K and %D in DataFrame\n",
+    "df['%K'] = stoch['STOCHk_14_3_3']\n",
+    "df['%D'] = stoch['STOCHd_14_3_3']"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 25,
+   "id": "d5e77a01-c81a-48f7-8b92-e78bd666e028",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Compute Williams %R (14-period)\n",
+    "df[\"Williams_%R\"] = ta.willr(df[\"High\"], df[\"Low\"], df[\"Close\"], length=14)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 26,
+   "id": "8459600d-38eb-43e5-9f84-c04b55c34722",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Compute ROC for 5, 10, and 20 periods\n",
+    "df[\"ROC_5\"] = ta.roc(df[\"Close\"], length=5)\n",
+    "df[\"ROC_10\"] = ta.roc(df[\"Close\"], length=10)\n",
+    "df[\"ROC_20\"] = ta.roc(df[\"Close\"], length=20)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 27,
+   "id": "e6499a70-c856-4639-9471-ac38fb5aa9fb",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Compute CCI for 14-period and 50-period\n",
+    "df[\"CCI_14\"] = ta.cci(df[\"High\"], df[\"Low\"], df[\"Close\"], length=14)\n",
+    "df[\"CCI_50\"] = ta.cci(df[\"High\"], df[\"Low\"], df[\"Close\"], length=50)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 28,
+   "id": "d56f32a1-e1bc-4f29-8616-59c5cfc4ffd7",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Compute Momentum Indicator for 10-period\n",
+    "df[\"MOM_10\"] = ta.mom(df[\"Close\"], length=10)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 29,
+   "id": "e0e90518-f739-4cd1-9cc6-e15e91819ee1",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Compute Chande Momentum Oscillator for 14-period\n",
+    "df[\"CMO_14\"] = ta.cmo(df[\"Close\"], length=14)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 30,
+   "id": "c6cfa29b-f8c0-49d7-94d4-d6f838b4692c",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Compute Ultimate Oscillator (default periods: 7, 14, 28)\n",
+    "df[\"UO\"] = ta.uo(df[\"High\"], df[\"Low\"], df[\"Close\"])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 31,
+   "id": "8721a25c-1e1a-4577-9b16-84a583d5f3c8",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Compute KST\n",
+    "kst_df = ta.kst(df[\"Close\"])  \n",
+    "# Print column names to check what they are\n",
+    "#print(kst_df.columns)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 32,
+   "id": "94b72f5e-dc72-420a-8351-a039705235f5",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Assign KST and Signal Line separately\n",
+    "df[\"KST\"] = kst_df[\"KST_10_15_20_30_10_10_10_15\"]\n",
+    "df[\"KST_Signal\"] = kst_df[\"KSTs_9\"]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 33,
+   "id": "2feea67d-74eb-4063-82b5-69ac47c713dc",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df[\"Smoothed_RSI\"] = ta.sma(df[\"RSI_14\"], length=5)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 34,
+   "id": "db309d24-bf0f-4b40-8a65-92c572a7a692",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Compute Bollinger Bands (20-period SMA, 2 Standard Deviations)\n",
+    "bbands = ta.bbands(df[\"Close\"], length=20, std=2)\n",
+    "# Assign Upper, Middle, and Lower Bands\n",
+    "df[\"BB_Upper\"] = bbands[\"BBU_20_2.0\"]\n",
+    "df[\"BB_Middle\"] = bbands[\"BBM_20_2.0\"]\n",
+    "df[\"BB_Lower\"] = bbands[\"BBL_20_2.0\"]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 35,
+   "id": "0c348819-6eb9-4746-abc7-8a58dd3d3991",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Compute Bollinger %B\n",
+    "df[\"BB_PercentB\"] = (df[\"Close\"] - df[\"BB_Lower\"]) / (df[\"BB_Upper\"] - df[\"BB_Lower\"])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 36,
+   "id": "06f94b98-a845-4f7a-867e-018cd4493ff9",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Compute ATR for 14 and 20 periods\n",
+    "df[\"ATR_14\"] = ta.atr(df[\"High\"], df[\"Low\"], df[\"Close\"], length=14)\n",
+    "df[\"ATR_20\"] = ta.atr(df[\"High\"], df[\"Low\"], df[\"Close\"], length=20)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 37,
+   "id": "3496662a-12ff-48f4-b06e-44d6542a856b",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Compute Keltner Channels (Default: 20 EMA, 2x ATR)\n",
+    "kc = ta.kc(df[\"High\"], df[\"Low\"], df[\"Close\"], length=20, scalar=2)\n",
+    "# Assign columns\n",
+    "df[\"KC_Middle\"] = kc[\"KCLe_20_2.0\"]\n",
+    "df[\"KC_Upper\"] = kc[\"KCBe_20_2.0\"]\n",
+    "df[\"KC_Lower\"] = kc[\"KCUe_20_2.0\"]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 38,
+   "id": "0528a744-69c9-4ca3-8bdc-0a67845c408c",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Compute Donchian Channels (20 and 50 periods)\n",
+    "dc_20 = ta.donchian(df[\"High\"], df[\"Low\"], length=20)\n",
+    "# Assign to DataFrame\n",
+    "df[\"DC_Upper_20\"] = dc_20[\"DCL_20_20\"]\n",
+    "df[\"DC_Lower_20\"] = dc_20[\"DCM_20_20\"]\n",
+    "df[\"DC_Mid_20\"] = dc_20[\"DCU_20_20\"]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 39,
+   "id": "c9ba8fde-d0ba-40cc-b992-dd120c95545b",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Step 1: Compute High-Low Range\n",
+    "df[\"HL_Range\"] = df[\"High\"] - df[\"Low\"]\n",
+    "\n",
+    "# Step 2: Compute 10-period EMA of High-Low Range\n",
+    "df[\"HL_EMA\"] = df[\"HL_Range\"].ewm(span=10, adjust=False).mean()\n",
+    "\n",
+    "# Step 3: Compute 10-period Rate of Change of HL_EMA\n",
+    "df[\"CVI\"] = ((df[\"HL_EMA\"] - df[\"HL_EMA\"].shift(10)) / df[\"HL_EMA\"].shift(10)) * 100"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 40,
+   "id": "2b1a05ee-4b5a-4a53-bcb1-6d68c4779376",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Compute Standard Deviation for 10 and 20 periods\n",
+    "df[\"STDDEV_10\"] = ta.stdev(df[\"Close\"], length=10)\n",
+    "df[\"STDDEV_20\"] = ta.stdev(df[\"Close\"], length=20)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 41,
+   "id": "9da511ad-3908-43dc-9427-9dbd653bff00",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Compute log returns\n",
+    "df[\"Log_Returns\"] = np.log(df[\"Close\"] / df[\"Close\"].shift(1))\n",
+    "\n",
+    "# Compute rolling standard deviation (e.g., 10 and 20 periods)\n",
+    "df[\"HV_10\"] = df[\"Log_Returns\"].rolling(window=10).std() * np.sqrt(252)\n",
+    "df[\"HV_20\"] = df[\"Log_Returns\"].rolling(window=20).std() * np.sqrt(252)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 42,
+   "id": "8634ac74-3811-4da7-826e-0dafb6c9a86e",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Compute Garman-Klass Volatility (10 and 20 periods)\n",
+    "df[\"GK_Vol_10\"] = (\n",
+    "    (0.5 * (np.log(df[\"High\"] / df[\"Low\"]) ** 2) - (2 * np.log(2) - 1) * (np.log(df[\"Close\"] / df[\"Open\"]) ** 2))\n",
+    "    .rolling(window=10)\n",
+    "    .mean()\n",
+    "    .apply(np.sqrt)\n",
+    "    * np.sqrt(252)  # Annualized volatility\n",
+    ")\n",
+    "\n",
+    "df[\"GK_Vol_20\"] = (\n",
+    "    (0.5 * (np.log(df[\"High\"] / df[\"Low\"]) ** 2) - (2 * np.log(2) - 1) * (np.log(df[\"Close\"] / df[\"Open\"]) ** 2))\n",
+    "    .rolling(window=20)\n",
+    "    .mean()\n",
+    "    .apply(np.sqrt)\n",
+    "    * np.sqrt(252)  # Annualized volatility\n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 43,
+   "id": "f7463f7f-7c12-448b-abea-a3ae09085785",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Ensure 'Volume' is numeric\n",
+    "df[\"Volume\"] = pd.to_numeric(df[\"Volume\"], errors=\"coerce\")\n",
+    "\n",
+    "# Compute OBV\n",
+    "df[\"OBV\"] = (df[\"Volume\"] * (df[\"Close\"].diff().apply(lambda x: 1 if x > 0 else (-1 if x < 0 else 0)))).cumsum()\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 44,
+   "id": "952643c8-8204-490a-aa97-1cde9470bc7d",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Compute Money Flow Multiplier (MFM)\n",
+    "df[\"MFM\"] = ((df[\"Close\"] - df[\"Low\"]) - (df[\"High\"] - df[\"Close\"])) / (df[\"High\"] - df[\"Low\"])\n",
+    "\n",
+    "# Compute Money Flow Volume (MFV)\n",
+    "df[\"MFV\"] = df[\"MFM\"] * df[\"Volume\"]\n",
+    "\n",
+    "# Compute Accumulation/Distribution Line (A/D)\n",
+    "df[\"AD\"] = df[\"MFV\"].cumsum()\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 45,
+   "id": "f9242f2a-d09d-4597-ab1e-b56e169ae3c6",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Compute Chaikin Money Flow (CMF) for a 20-period window\n",
+    "df[\"CMF_20\"] = ta.cmf(df[\"High\"], df[\"Low\"], df[\"Close\"], df[\"Volume\"], length=20)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 46,
+   "id": "79a31c9c-7fad-4500-bee5-e72adb186d46",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Compute Force Index (FI) manually\n",
+    "df[\"FI_13\"] = (df[\"Close\"].diff(1)) * df[\"Volume\"]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 47,
+   "id": "e931d5d7-6564-484d-8221-90d3b413b4fd",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Compute VWAP\n",
+    "df[\"Typical_Price\"] = (df[\"High\"] + df[\"Low\"] + df[\"Close\"]) / 3\n",
+    "df[\"Cumulative_TPV\"] = (df[\"Typical_Price\"] * df[\"Volume\"]).cumsum()\n",
+    "df[\"Cumulative_Volume\"] = df[\"Volume\"].cumsum()\n",
+    "df[\"VWAP\"] = df[\"Cumulative_TPV\"] / df[\"Cumulative_Volume\"]\n",
+    "\n",
+    "# Drop intermediate columns (optional)\n",
+    "df.drop(columns=[\"Typical_Price\", \"Cumulative_TPV\", \"Cumulative_Volume\"], inplace=True)\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 48,
+   "id": "ce948717-6806-48ac-8ddd-73b5a03b6881",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Compute Volume Rate of Change (VROC) for 10 and 20 periods\n",
+    "df[\"VROC_10\"] = ((df[\"Volume\"] - df[\"Volume\"].shift(10)) / df[\"Volume\"].shift(10)) * 100\n",
+    "df[\"VROC_20\"] = ((df[\"Volume\"] - df[\"Volume\"].shift(20)) / df[\"Volume\"].shift(20)) * 100"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 49,
+   "id": "d4878de0-96ad-463c-9a78-4d577b15abb9",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Compute Price Volume Trend (PVT)\n",
+    "df[\"PVT\"] = (df[\"Close\"].pct_change()) * df[\"Volume\"]\n",
+    "df[\"PVT\"] = df[\"PVT\"].cumsum()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 50,
+   "id": "7c446c3a-9ffc-4db0-9168-042355a427fb",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Function to calculate Pivot Points\n",
+    "def calculate_pivot_points(df):\n",
+    "    df[\"Pivot\"] = (df[\"High\"] + df[\"Low\"] + df[\"Close\"]) / 3\n",
+    "    \n",
+    "    # Standard Pivot Points\n",
+    "    df[\"R1\"] = (2 * df[\"Pivot\"]) - df[\"Low\"]\n",
+    "    df[\"S1\"] = (2 * df[\"Pivot\"]) - df[\"High\"]\n",
+    "    df[\"R2\"] = df[\"Pivot\"] + (df[\"High\"] - df[\"Low\"])\n",
+    "    df[\"S2\"] = df[\"Pivot\"] - (df[\"High\"] - df[\"Low\"])\n",
+    "    df[\"R3\"] = df[\"High\"] + 2 * (df[\"Pivot\"] - df[\"Low\"])\n",
+    "    df[\"S3\"] = df[\"Low\"] - 2 * (df[\"High\"] - df[\"Pivot\"])\n",
+    "    \n",
+    "    # Fibonacci Pivot Points\n",
+    "    df[\"FR1\"] = df[\"Pivot\"] + 0.382 * (df[\"High\"] - df[\"Low\"])\n",
+    "    df[\"FS1\"] = df[\"Pivot\"] - 0.382 * (df[\"High\"] - df[\"Low\"])\n",
+    "    df[\"FR2\"] = df[\"Pivot\"] + 0.618 * (df[\"High\"] - df[\"Low\"])\n",
+    "    df[\"FS2\"] = df[\"Pivot\"] - 0.618 * (df[\"High\"] - df[\"Low\"])\n",
+    "    df[\"FR3\"] = df[\"Pivot\"] + 1.000 * (df[\"High\"] - df[\"Low\"])\n",
+    "    df[\"FS3\"] = df[\"Pivot\"] - 1.000 * (df[\"High\"] - df[\"Low\"])\n",
+    "\n",
+    "    # Camarilla Pivot Points\n",
+    "    df[\"CR1\"] = df[\"Close\"] + 1.1 * (df[\"High\"] - df[\"Low\"]) / 12\n",
+    "    df[\"CS1\"] = df[\"Close\"] - 1.1 * (df[\"High\"] - df[\"Low\"]) / 12\n",
+    "    df[\"CR2\"] = df[\"Close\"] + 1.1 * (df[\"High\"] - df[\"Low\"]) / 6\n",
+    "    df[\"CS2\"] = df[\"Close\"] - 1.1 * (df[\"High\"] - df[\"Low\"]) / 6\n",
+    "    df[\"CR3\"] = df[\"Close\"] + 1.1 * (df[\"High\"] - df[\"Low\"]) / 4\n",
+    "    df[\"CS3\"] = df[\"Close\"] - 1.1 * (df[\"High\"] - df[\"Low\"]) / 4\n",
+    "    df[\"CR4\"] = df[\"Close\"] + 1.1 * (df[\"High\"] - df[\"Low\"]) / 2\n",
+    "    df[\"CS4\"] = df[\"Close\"] - 1.1 * (df[\"High\"] - df[\"Low\"]) / 2\n",
+    "    \n",
+    "    return df\n",
+    "\n",
+    "# Apply function\n",
+    "df = calculate_pivot_points(df)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 51,
+   "id": "8d441e5a-112b-45e5-bd9b-9a073ab2744c",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "110"
+      ]
+     },
+     "execution_count": 51,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "a=df.columns\n",
+    "len(a)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 52,
+   "id": "0a156b31-5b5d-4ab1-b631-a093af96986b",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#df.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 53,
+   "id": "26741c72-a10c-4c1e-b1c3-d70255da6055",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "NaN values:\n",
+      " Close     0\n",
+      "High      0\n",
+      "Low       0\n",
+      "Open      0\n",
+      "Volume    0\n",
+      "         ..\n",
+      "CS2       0\n",
+      "CR3       0\n",
+      "CS3       0\n",
+      "CR4       0\n",
+      "CS4       0\n",
+      "Length: 110, dtype: int64\n"
+     ]
+    }
+   ],
+   "source": [
+    "#df[30:]\n",
+    "#print(\"NaN values:\\n\", df[30:].isnull())\n",
+    "print(\"NaN values:\\n\", df[100:].isnull().sum())"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 54,
+   "id": "8d10b881-5aac-4a18-a192-342289064136",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#df.index = pd.to_datetime(df.index)\n",
+    "df = df.reset_index(drop=True)\n",
+    "df.to_csv('nifty_clean.csv', index=True) "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "7b3b34b1-6642-4429-a472-b676f5a31bb9",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "c095c3b8-31a3-436c-9dc8-9df297f6a9d1",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "6e7a6389-48cd-400e-8aa3-94e4cfccf75e",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.12.7"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
